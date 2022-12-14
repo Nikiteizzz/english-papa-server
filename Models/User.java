@@ -1,9 +1,10 @@
 package Models;
 
+import Interfaces.Model;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class User {
+public class User implements Model {
     String login;
     String name;
     String surname;
@@ -74,7 +75,7 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
-
+    @Override
     public void fromJsonString(String jsonString) {
         JSONParser parser = new JSONParser();
         try {
@@ -90,7 +91,7 @@ public class User {
             return;
         }
     }
-
+    @Override
     public JSONObject toJsonObject() {
         JSONObject object = new JSONObject();
         object.put("login", this.login);

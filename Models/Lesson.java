@@ -1,11 +1,12 @@
 package Models;
 
+import Interfaces.Model;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.util.Date;
 
-public class Lesson {
+public class Lesson implements Model {
     String dayOfWeek;
     String lessonName;
     long number;
@@ -69,7 +70,7 @@ public class Lesson {
     public String getGroup() {
         return group;
     }
-
+    @Override
     public void fromJsonString(String jsonString) {
         JSONParser parser = new JSONParser();
         //    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -86,7 +87,7 @@ public class Lesson {
             return;
         }
     }
-
+    @Override
     public JSONObject toJsonObject() {
         JSONObject object = new JSONObject();
         object.put("day_of_week", this.dayOfWeek);
