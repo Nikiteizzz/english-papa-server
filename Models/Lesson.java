@@ -13,6 +13,7 @@ public class Lesson implements Model {
     long teacherId;
     long cabinet;
     String group;
+    long id;
     public Lesson() {}
     public Lesson(String dayOfWeek, String lessonName, long number, long teacherId, long cabinet, String group) {
         this.dayOfWeek = dayOfWeek;
@@ -43,6 +44,10 @@ public class Lesson implements Model {
         this.group = group;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getDayOfWeek() {
         return dayOfWeek;
     }
@@ -70,6 +75,11 @@ public class Lesson implements Model {
     public String getGroup() {
         return group;
     }
+
+    public long getId() {
+        return id;
+    }
+
     @Override
     public void fromJsonString(String jsonString) {
         JSONParser parser = new JSONParser();
@@ -83,6 +93,7 @@ public class Lesson implements Model {
             this.lessonName = (String) object.get("lesson_name");
             this.cabinet = (long) object.get("cabinet");
             this.group = (String) object.get("group");
+            this.id = (long) object.get("id");
         } catch (Exception e) {
             return;
         }
@@ -96,6 +107,7 @@ public class Lesson implements Model {
         object.put("lesson_name", this.lessonName);
         object.put("cabinet", this.cabinet);
         object.put("group", this.group);
+        object.put("id", this.id);
         return object;
     }
 }

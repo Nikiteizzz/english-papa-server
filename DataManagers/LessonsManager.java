@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -36,6 +37,7 @@ public class LessonsManager {
             Lesson lesson;
             while (resultSet.next()) {
                 lesson = new Lesson();
+                lesson.setId(resultSet.getLong(1));
                 lesson.setDayOfWeek(resultSet.getString(2));
                 lesson.setNumber(resultSet.getLong(4));
                 lesson.setCabinet(resultSet.getLong(7));
@@ -55,5 +57,33 @@ public class LessonsManager {
             logsTextArea.appendText("Ошибка запроса!\nОписание: " + e.getLocalizedMessage() + "\n");
             outputStream.writeObject("Ошибка запроса!");
         }
+    }
+
+    public void addLesson(String lesson) throws SQLException, IOException {
+        Lesson lesson1 = new Lesson();
+        lesson1.fromJsonString(lesson);
+        String dayOfWeek = switch (lesson1.getDayOfWeek()) {
+            case "понедельник" -> "MONDAY";
+            case "вторник" -> "TUESDAY";
+            case "среда" -> "WEDNESDAY";
+            case "четверг" -> "THURSDAY";
+            case "пятница" -> "FRIDAY";
+            case "суббота" -> "SATURDAY";
+            default -> "ERROR";
+        };
+        String request = "insert into lessons (day_of_week, lesson, number, teacherId, groupp, cabinet) values " +
+                "('" + dayOfWeek + "', '" + lesson1.getLessonName() + "', '" + lesson1.getNumber() + "', '" +
+                lesson1.getTeacherId() + "', '" + lesson1.getGroup() + "', '" + lesson1.getCabinet() + "')";
+        System.out.println(request);
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(request);
+        outputStream.writeObject("Success");
+    }
+
+    public void deleteLessonFromDB(String id) throws SQLException, IOException {
+        String requestString = "Delete from lessons where id  = '" + id + "'";
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(requestString);
+        outputStream.writeObject("Success");
     }
 }

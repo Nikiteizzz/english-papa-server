@@ -76,6 +76,7 @@ public class ServerThread extends Thread {
                     case "lessons": lessonsManager.tryGetLessons(keywords[2], keywords[3]); break;
                     case "students": studentsManager.getStudents(); break;
                     case "invite_codes": inviteCodeManager.getInviteCodes(); break;
+                    case "users": usersManager.requestUsers(); break;
                 }
                 break;
             case "update": {
@@ -88,11 +89,27 @@ public class ServerThread extends Thread {
                 user.fromJsonString(keywords[1]);
                 tryToRegister(user, keywords[2]);
             } break;
-            case "add": {
-
-            }
+            case "add":
+                switch (keywords[1]) {
+                    case "invite_code": {
+                        inviteCodeManager.addNewInviteCode(keywords[2], keywords[3]);
+                    } break;
+                    case "lesson": {
+                        lessonsManager.addLesson(keywords[2]);
+                    }
+                }break;
+            case "delete":
+                switch (keywords[1]) {
+                    case "invite_code": {
+                        inviteCodeManager.deleteInviteCodeFromDB(keywords[2]);
+                    }break;
+                    case "lesson": {
+                        lessonsManager.deleteLessonFromDB(keywords[2]);
+                    }
+                }break;
             default:
                 logsTextArea.appendText("Ошибка запроса!\n");
+                outputStream.writeObject("Неизвестный запрос");
         }
     }
 
@@ -103,8 +120,7 @@ public class ServerThread extends Thread {
                 outputStream.writeObject("Код не существует!");
             } else {
                 usersManager.addNewUser(user, serverInviteCode.getAdmin());
-                outputStream.writeObject("Success");
-                inviteCodeManager.deleteInviteCodeFromDB(serverInviteCode);
+                inviteCodeManager.deleteInviteCodeFromDB(serverInviteCode.getInviteCode());
 
             }
         } else {

@@ -67,9 +67,31 @@ public class InviteCodeManager {
         }
     }
 
-    public void deleteInviteCodeFromDB(InviteCode inviteCode) throws SQLException {
-        String requestString = "Delete from invite_codes where invite_code  = '" + inviteCode.getInviteCode() + "'";
+    public void deleteInviteCodeFromDB(String inviteCode) throws SQLException, IOException {
+        String requestString = "Delete from invite_codes where invite_code  = '" + inviteCode + "'";
         Statement statement = connection.createStatement();
         statement.executeUpdate(requestString);
+        outputStream.writeObject("Success");
     }
+
+    private boolean isInviteCodeUnique(String inviteCode) throws SQLException {
+        String request = "Select * from invite_codes where invite_code = '" + inviteCode + "'";
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(request);
+        return !resultSet.next();
+    }
+
+    public void addNewInviteCode(String inviteCode,String isAdmin) throws SQLException, IOException {
+        if (isInviteCodeUnique(inviteCode)) {
+            boolean isAdministrator = Boolean.parseBoolean(isAdmin);
+            String request = "Insert into invite_codes (invite_code, isAdmin) " +
+                    "values ('" + inviteCode + "', '" + (isAdministrator ? "1" : "0") + "')";
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(request);
+            outputStream.writeObject("Success");
+        } else {
+            outputStream.writeObject("Код не уникален");
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package DataManagers;
 import Models.InviteCode;
 import Models.User;
 import javafx.scene.control.TextArea;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class UsersManager {
     ObjectOutputStream outputStream;
@@ -100,6 +102,39 @@ public class UsersManager {
 
     private String getCodedPassword(String password) {
         return String.valueOf(password.hashCode());
+    }
+
+    public void requestUsers() throws SQLException, IOException {
+        String request = "Select * from users";
+        ResultSet resultSet;
+        JSONObject sendJSONObject = new JSONObject();
+        ArrayList<User> dbData = new ArrayList<>(0);
+        try {
+            Statement statement = connection.createStatement();
+            resultSet = statement.executeQuery(request);
+            User user;
+            while (resultSet.next()) {
+                user = new User();
+                user.setLogin(resultSet.getString(3));
+                user.setName(resultSet.getString(2));
+                user.setSurname(resultSet.getString(6));
+                user.setId(resultSet.getLong(1));
+                user.setPassword(resultSet.getString(4));
+                user.setRole(resultSet.getString(7));
+                user.setAdmin(resultSet.getBoolean(5));
+                dbData.add(user);
+            }
+            JSONArray resultsArray = new JSONArray();
+            for (User element : dbData) {
+                resultsArray.add(element.toJsonObject());
+            }
+            sendJSONObject.put("users", resultsArray);
+            System.out.println(sendJSONObject.toJSONString());
+            outputStream.writeObject(sendJSONObject.toJSONString());
+        } catch (Exception e) {
+            logsTextArea.appendText("Ошибка запроса!\nОписание: " + e.getLocalizedMessage() + "\n");
+            outputStream.writeObject("Ошибка запроса!");
+        }
     }
 
 }
